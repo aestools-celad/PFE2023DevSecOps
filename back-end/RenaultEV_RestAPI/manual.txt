@@ -1,0 +1,49 @@
+Rest Api Manual  :
+    - all get commands should follow this form : server_address:port/api/[command]
+
+    - ["/chargelocations_all"] : get all chargelocations regitsered in the database (if the database is completely full it may timeout while getting all the data)
+    Home:
+
+    Get Commands to fill the database  From remote:
+
+    Get commands for Getting Charge locations data from our  rest api local db  :
+             - "/chargelocations_nearest"  :
+                    *** function ***
+                    returns the nearest station  to your location
+
+                    *** required params ***
+                    "lat" , "lng" both of type double , the latitude and the longitude of the user position
+
+               - "/chargelocations_bounds"
+                    *** function ***
+                    returns a list of the charge locations within determined bounds non clustered -- depends on the bounds may timeout if too many locations
+                    this is here just for testing purposes
+                    need to add limit to number of locations per response  or increase response time .
+
+                    *** required params ***
+                    "sw_lat" latitude of the south-west bounds point , "sw_lng" longitude of the south_west bounds point
+                    "ne_lat" latitude of the south-west bounds point , "ne_lng" longitude of the south_west bounds point
+
+               - "/chargelocations_bounds_count"
+                    *** function ***
+                    returns the number of stations within specified bounds
+
+                    *** required params ***
+                    same as "/chargelocations_bounds"
+
+
+            - "/chargelocation"
+            - "/home"
+            - "/add_chargelocation"
+            - "/delete_chargelocation"
+            - "/add_chargelocations_from_remote"
+            - "/parse_goingelectric"
+            - "/delete_chargelocations"
+
+            - "/chargelocations_radius"
+            - "/chargelocations_clusters"
+            - "/chargelocations_clusters_old"
+            - "/chargelocations_clusters_count"
+
+            - "/parse_goingelectric_images"
+            - "/image"

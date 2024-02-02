@@ -1,0 +1,11 @@
+<!--<app-map></app-map>
+<app-charge-location></app-charge-location>
+<app-sidenav></app-sidenav>-->
+
+
+
+<app-sidenav (onToggleSideNav)="onToggleSideNav($event)"></app-sidenav>
+<app-body
+    [collapsed]="isSideNavCollapsed"
+    [screenWidth]="screenWidth"
+></app-body>

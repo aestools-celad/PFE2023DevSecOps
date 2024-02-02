@@ -1,0 +1,48 @@
+apiVersion: apps/v1 # Kubernetes API version
+kind: Deployment  # Kubernetes resource kind we are creating
+metadata:
+  name: angular-deployment
+  labels:
+    app: angular-deployment
+    tier: frontend
+  #namespace: frontend
+spec:
+  selector:
+    matchLabels:
+      app: angular-deployment
+  replicas: 2 # Number of replicas that will be created for this deployment
+  template:
+    metadata:
+      labels:
+        app: angular-deployment
+        tier: frontend
+    spec:
+      containers:
+      - name: angular-deployment
+        #image: houda99/renault-front:v2 # Image that will be used to containers in the cluster
+        #image : "$CI_REGISTRY_IMAGE/$BUILD_IMAGE_FRONT:$BUILD_DOCKER_IMAGE_VERSION"
+        image: registry.gitlab.com/houda99/renault-application/my-frontend-image:V1
+        #image: houda99/renault-front:v2
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80 # The port that the container is running on in the cluster
+      imagePullSecrets: 
+      - name: registry-credentials
+---
+
+kind: Service  # Kubernetes API version
+apiVersion: v1 # Kubernetes resource kind we are creating
+metadata:
+  name: angular-service
+  labels:
+    app: angular-deployment
+    tier: frontend
+spec:
+  type: LoadBalancer 
+  selector:
+    app: angular-deployment
+  ports: 
+    - name: http
+      port: 80 # Service Port
+      targetPort: 80 # Container Port
+     # type of the service.

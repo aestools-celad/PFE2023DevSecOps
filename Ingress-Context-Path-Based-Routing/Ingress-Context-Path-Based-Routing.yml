@@ -1,0 +1,47 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-cpr
+  #namespace: ingress-basic
+  annotations:
+    #ingress.kubernetes.io/rewrite-target: /
+    
+    #kubernetes.io/ingress.class: nginx
+    #cert-manager.io/cluster-issuer: letsencrypt
+   # nginx.ingress.kubernetes.io/rewrite-target: /
+    #nginx.ingress.kubernetes.io/ssl-redirect: "true"
+   # nginx.ingress.kubernetes.io/use-regex: "true"
+spec:
+  ingressClassName: nginx
+
+  rules:
+    - host: renaultapp.com
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: springboot-svc
+                port:
+                  number: 8080
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: angular-service
+                port:
+                  number: 80
+  #tls:
+    #- hosts:
+    #  - renaultapp.com
+    #  secretName: renault-ingress-tls
+    
+    #secretName: renault-kubeoncloud-secret           
+  
+
+
+                             
+                  
+      
+

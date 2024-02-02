@@ -1,0 +1,112 @@
+# Docker Compose file Reference (https://docs.docker.com/compose/compose-file/)
+version: '3.3'
+
+#Define services
+services:
+
+  #PostgreSQL Database for the application
+  postgres-database:
+    image: "postgres"
+    container_name: postgres-database
+    restart: always
+    #Volume mounted for database for the storage
+    volumes:
+      - ./renault-data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Mount the SQL script into the container
+      - ./dump_renault.sql:/docker-entrypoint-initdb.d/dump_renault.sql
+
+
+    ports:
+      - 5432:5432 # Forward the exposed port 5432 on the container to port 5432 on the host machine
+    
+    #Environment variable for DB name, user and password
+    environment:
+      - POSTGRES_DB=EV_database
+      - POSTGRES_USER=renault_admin
+      - POSTGRES_PASSWORD=wellop
+      - PGHOSTADDR=0.0.0.0
+    
+    networks:
+      - renault-network
+
+
+  
+    healthcheck:
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  sonar:
+    image: sonarqube
+    environment:
+      SONARQUBE_JDBC_URL: jdbc:postgresql://postgres-database:5432/EV_database?user=renault_admin&password=wellop
+      SONARQUBE_JDBC_USERNAME: renault_admin
+      SONARQUBE_JDBC_PASSWORD: wellop
+    ports:
+      - 9000:9000
+    volumes:
+      - sonarqube_conf:/opt/sonarqube/conf
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_bundled-plugins:/opt/sonarqube/lib/bundled-plugins
+
+  #Back-end Spring Boot Application
+  backend-app:
+    #The docker file in backend build the jar and provides the docker image with the following name.
+    build: ./back-end/RenaultEV_RestAPI
+    container_name:  backend-image
+
+    #Environment variables for Spring Boot Application.
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-database:5432/EV_database?user=renault_admin&password=wellop
+      - SPRING_JPA_HIBERNATE_DDL_AUTO= update
+      - SPRING_JPA_SHOW-SQL= true
+      - POSTGRES_DB=EV_database
+      - POSTGRES_USER=renault_admin
+      - POSTGRES_PASSWORD=wellop
+      
+    ports:
+      - 8080:8080 # Forward the exposed port 8080 on the container to port 8080 on the host machine
+    links:
+      - postgres-database
+    networks:
+      - renault-network
+    depends_on: 
+      - postgres-database
+
+  #Front-end Angular Application
+  renaultapplication:
+    build: ./renaultApplication
+    container_name: frontend-image
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend-app
+    volumes:
+      - ./renaultApplication:/app
+    #command: >
+      #bash -c "npm start"
+    stdin_open: true
+    networks:
+      - renault-network
+    environment:
+      - API_URL=http://backend-app:8080
+     
+    #used in development environments where you want to enable file watching on the host machine 
+    #to automatically rebuild the container when changes are made.
+      - CHOKIDAR_USEPOLLING=true
+    dns:
+      - 8.8.8.8
+
+#Volumes for DB data
+volumes:
+  renault-data:
+  sonarqube_conf:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_bundled-plugins:
+  postgresql:
+  postgresql_data:
+
+networks:
+  renault-network:
+    driver: bridge

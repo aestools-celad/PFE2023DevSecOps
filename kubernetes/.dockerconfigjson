@@ -1,0 +1,10 @@
+{
+    "auths": {
+        "https://registry.gitlab.com":{
+            "username":"houda99",
+            "password":"glpat-H6eJmct4WFxeV_MBxqYL",
+            "email":"houda.sayar@actia-engineering.tn",
+            "auth":"aG91ZGE5OTo0c3NBZ3NiMUpNbzFheVJ5UFV4ag=="
+    	}
+    }
+}

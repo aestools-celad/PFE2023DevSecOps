@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springboot-deployment
+  labels:
+    app: springboot-k8s-postgresql
+    tier: backend
+spec:
+  selector:
+    matchLabels:
+      app: springboot-k8s-postgresql
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: springboot-k8s-postgresql
+        tier: backend
+    spec:
+      containers:
+        - name: springboot-k8s
+          #image: houda99/renault-back:v1 
+          image: registry.gitlab.com/houda99/renault-application/my-backend-image:V1
+            
+          ports:
+            - containerPort: 8080
+          #initContainers:
+        #- name: init-db
+          #image: busybox:1.31
+          #command: ['sh', '-c', 'echo -e "Checking for the availability of PostgreSQL Server deployment"; while ! nc -z postgresql 5432; do sleep 1; printf "-"; done; echo -e "  >> PostgreSQL DB Server has started";']
+          env:   # Setting Enviornmental Variables
+            
+           # - name: SPRING_DATASOURCE_URL
+            #  value: jdbc:postgresql://postgresql:5432/EV_database?useSSL=false
+            - name: POSTGRES_HOST   # Setting Database host address from configMap
+              valueFrom :
+                configMapKeyRef :
+                  name : db-config
+                  key :  host
+
+            - name: POSTGRES_DB  # Setting Database name from configMap
+              valueFrom :
+                configMapKeyRef :
+                  name : db-config
+                  key :  dbName
+
+            - name: POSTGRES_USER  # Setting Database username from Secret
+              valueFrom :
+                secretKeyRef :
+                  name : postgresql-secrets
+                  key :  username
+
+            - name: POSTGRES_PASSWORD # Setting Database password from Secret
+              valueFrom :
+                secretKeyRef :
+                  name : postgresql-secrets
+                  key :  password
+
+---
+
+apiVersion: v1 # Kubernetes API version
+kind: Service # Kubernetes resource kind we are creating
+metadata: # Metadata of the resource kind we are creating
+  name: springboot-svc
+  labels:
+    app: springboot-k8s-postgresql
+    tier: backend
+spec:
+  selector:
+    app: springboot-k8s-postgresql
+  ports:
+    
+   # - nodePort: 30163 
+    - protocol: "TCP"
+      port: 8080 # The port that the service is running on in the cluster
+      targetPort: 8080 # The port exposed by the service
+ # type: NodePort # type of the service.

@@ -1,0 +1,2 @@
+setup.kibana: 
+   host: "https://20.242.204.96:5601"

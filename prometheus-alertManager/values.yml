@@ -1,0 +1,29 @@
+alertmanager:
+  alertmanagerConfig:
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by: ['alertname']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 1h
+      receiver: 'email-notifications'
+  alertmanagerFiles:
+    alertmanager.yml: |-
+      receivers:
+        - name: 'email-notifications'
+          email_configs:
+            - to: 'houdasayar12@gmail.com'
+              send_resolved: true
+
+prometheusRuleSelectorNilUsesHelmValues: false
+prometheusRuleFiles:
+  prometheus-rules.yaml: |-
+    groups:
+      - name: example-rules
+        rules:
+          - alert: HighLatency
+            expr: job:request_latency_seconds:mean5m{job="your-service"} > 0.5
+            annotations:
+              summary: High latency detected
+              description: Latency is above the threshold for service your-service

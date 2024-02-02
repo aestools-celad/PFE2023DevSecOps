@@ -1,0 +1,9 @@
+{
+    "/api": {
+        "target": "springboot-svc",
+        "secure": false,
+        "logLevel": "debug",
+        "timeout": 300000 ,
+        "changeOrigin" : true
+    }
+}

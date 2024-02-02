@@ -1,0 +1,13 @@
+/* dashboard.component.css */
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Add additional styling if needed */
+  }
+  
+  /* Optionally, you can style the image itself */
+  .image-container img {
+    max-width: 100%;
+    max-height: 100%;
+  }
